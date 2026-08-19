@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>熊猫文创专栏 - 熊猫资讯</title>
+<meta name="description" content="熊猫元素文创种草资讯：官方上新、限量文创、绝版回顾、正版测评、盗版避雷。本站仅展示不交易。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐼</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<div class="page-hero">
+  <div class="wrap">
+    <h1>🎁 熊猫文创专栏</h1>
+    <p>熊猫元素文创种草资讯。本站仅做信息展示，<b>不承接任何交易、下单与支付</b>；官方购买渠道请认准场馆官方。</p>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="filter-tabs" id="catTabs">
+    <button class="filter-tab active" data-cat="">全部</button>
+    <button class="filter-tab" data-cat="官方上新">官方上新</button>
+    <button class="filter-tab" data-cat="限量文创">限量文创</button>
+    <button class="filter-tab" data-cat="绝版回顾">绝版回顾</button>
+    <button class="filter-tab" data-cat="正版测评">正版测评</button>
+    <button class="filter-tab" data-cat="盗版避雷">盗版避雷</button>
+    <button class="filter-tab" data-cat="guard" style="border-color:var(--red);color:var(--red)">🛡️ 避雷专区</button>
+  </div>
+
+  <div class="grid grid-3" id="grid"></div>
+
+  <section class="section">
+    <div class="card card-pad" style="background:var(--bg-soft)">
+      <div style="font-size:15px;color:var(--ink-2)">
+        <b style="color:var(--ink)">⚠️ 重要说明：</b>本站为纯内容展示站，不参与任何交易。文创产品的发售、价格与购买请认准出品方官方渠道；
+        对标注"盗版避雷"的内容请提高警惕，支持正版授权产品，保护创作者与场馆权益。
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+<div id="toast"></div>
+
+<script src="js/seed-data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script>
+(function () {
+  var DB = PandaDB, U = PandaUI, esc = U.esc, $ = U.$, $$ = U.$$;
+  var state = { cat: '' };
+
+  function card(c) {
+    var licBadge = c.licensed
+      ? '<span class="tag green">✓ 官方授权</span>'
+      : '<span class="tag red">✗ 非授权/盗版风险</span>';
+    var tags = (c.tags || []).map(function (t) { return '<span class="tag gray">' + esc(t) + '</span>'; }).join('');
+    return '<div class="card">' +
+      '<div class="panda-avatar" style="border-radius:0">' + U.pandaSVG(c.title, c.id, { w: 480, name: false }) + '</div>' +
+      '<div class="card-pad">' +
+      '<div class="card-meta" style="margin-top:0"><span class="tag ' + (c.category === '盗版避雷' ? 'red' : c.category === '绝版回顾' ? 'orange' : 'blue') + '">' + esc(c.category) + '</span>' + licBadge + '</div>' +
+      '<div class="card-title" style="margin-top:8px">' + esc(c.title) + '</div>' +
+      '<div class="card-meta">出品方：' + esc(c.brand) + '</div>' +
+      '<div class="card-desc">' + esc(U.chunk(c.intro, 66)) + '</div>' +
+      '<div class="card-meta">' + (c.saleTime ? '发售：' + c.saleTime : '发售信息待公布') + '</div>' +
+      '<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">' + tags +
+      (c.link ? '<a class="btn btn-primary btn-sm" href="' + esc(c.link) + '" target="_blank" rel="noopener">官方渠道 ↗</a>' : '') +
+      '</div></div></div>';
+  }
+
+  function render() {
+    if (state.cat === 'guard') { location.href = 'guard.html'; return; }
+    var list = DB.all('culture').filter(function (c) { return !state.cat || c.category === state.cat; });
+    $('#grid').innerHTML = list.length ? list.map(card).join('')
+      : '<div class="empty" style="grid-column:1/-1"><div class="big">🎁</div>该分类暂无内容</div>';
+  }
+
+  $$('#catTabs .filter-tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      $$('#catTabs .filter-tab').forEach(function (t) { t.classList.remove('active'); });
+      tab.classList.add('active');
+      state.cat = tab.dataset.cat;
+      render();
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

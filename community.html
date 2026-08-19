@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>猫粉投稿社区 - 熊猫资讯</title>
+<meta name="description" content="猫粉投稿UGC社区：实拍作品、观展游记、科普短文、手绘二创，点赞评论交流。投稿需审核后展示。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐼</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<div class="page-hero">
+  <div class="wrap">
+    <h1>💬 猫粉投稿社区</h1>
+    <p>猫粉们的作品与见闻分享区。投稿需经后台审核后展示；评论同样需要审核。请遵守：不盗图、不引战、不造谣。</p>
+    <div style="margin-top:14px"><a class="btn btn-primary" href="submit.html">📝 我要投稿</a></div>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="filter-tabs" id="typeTabs">
+    <button class="filter-tab active" data-type="">全部投稿</button>
+    <button class="filter-tab" data-type="实拍作品">📷 实拍作品</button>
+    <button class="filter-tab" data-type="观展游记">🎫 观展游记</button>
+    <button class="filter-tab" data-type="科普短文">📄 科普短文</button>
+    <button class="filter-tab" data-type="手绘二创">🎨 手绘二创</button>
+  </div>
+
+  <div id="list"></div>
+
+  <div class="card card-pad" style="margin-top:20px;background:var(--bg-soft)">
+    <b style="color:var(--ink)">社区守则</b>
+    <p style="font-size:13.5px;color:var(--ink-2);margin-top:4px">① 所有作品须为原创或已获授权，盗图、引战、造谣内容将被删除并拉黑；② 尊重每一只熊猫与每一位猫粉，禁止饭圈对立；③ 投稿版权归原作者所有，本站仅做非商业公益展示。</p>
+  </div>
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+<div id="toast"></div>
+
+<script src="js/seed-data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script>
+(function () {
+  var DB = PandaDB, U = PandaUI, esc = U.esc, $ = U.$, $$ = U.$$;
+  var state = { type: '' };
+
+  function renderComments(subId) {
+    var list = DB.all('comments').filter(function (c) { return c.subId === subId && c.status === 'approved'; });
+    return list.length
+      ? '<div class="comment-box"><div style="font-size:12.5px;color:var(--ink-3);margin-bottom:4px">评论（' + list.length + '）</div>' +
+        list.map(function (c) {
+          return '<div class="comment-item"><span class="c-name">' + esc(c.nickname) + '</span><span class="c-text">' + esc(c.content) + '</span><span class="c-time">' + U.timeAgo(c.date) + '</span></div>';
+        }).join('') + '</div>'
+      : '';
+  }
+
+  function render() {
+    var list = DB.all('subs').filter(function (s) { return s.status === 'approved'; })
+      .filter(function (s) { return !state.type || s.type === state.type; })
+      .sort(function (a, b) {
+        return (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || (a.date < b.date ? 1 : -1);
+      });
+    $('#list').innerHTML = list.length ? list.map(function (s) {
+      var likeKey = 'sub:' + s.id;
+      var liked = DB.isLiked(likeKey);
+      var imgs = (s.images || []).map(function (img, i) {
+        return '<div class="ph">' + U.pandaSVG(s.nickname + i, s.id + img, { w: 640, name: false }) + '</div>';
+      }).join('');
+      return '<div class="card post-card">' +
+        '<div class="post-head">' +
+        '<div class="panda-avatar small">' + U.pandaSVG(s.nickname, s.id, { w: 96, name: false }) + '</div>' +
+        '<div><div class="name">' + esc(s.nickname) + (s.featured ? ' <span class="tag orange">★ 月度精选</span>' : '') + '</div>' +
+        '<div class="time">' + U.timeAgo(s.date) + ' · ' + esc(s.type) + '</div></div>' +
+        '</div>' +
+        '<div class="post-body"><div class="card-title" style="font-size:15.5px">' + esc(s.title) + '</div>' +
+        '<div class="card-desc" style="white-space:pre-line">' + esc(s.content) + '</div>' +
+        (imgs ? '<div class="post-imgs">' + imgs + '</div>' : '') +
+        '</div>' +
+        '<div class="post-actions">' +
+        '<button class="like-btn ' + (liked ? 'liked' : '') + '" data-like="' + s.id + '">' + (liked ? '♥ ' : '♡ ') + (s.likes + (liked ? 1 : 0)) + ' 赞</button>' +
+        '<button class="like-btn" data-comment="' + s.id + '">💬 评论</button>' +
+        '</div>' +
+        renderComments(s.id) +
+        '<div class="comment-box" data-cbox="' + s.id + '" style="display:none">' +
+        '<div style="display:flex;gap:8px"><input class="input" style="flex:1" data-cinput="' + s.id + '" placeholder="友善评论，审核后展示（昵称随机）" />' +
+        '<button class="btn btn-primary btn-sm" data-csend="' + s.id + '">发送</button></div>' +
+        '<div style="font-size:12px;color:var(--ink-3);margin-top:6px">评论需后台审核通过后展示；请勿发布违规内容。</div>' +
+        '</div></div>';
+    }).join('') : '<div class="empty"><div class="big">🌱</div>该分类下暂无投稿，欢迎 <a href="submit.html">投稿</a></div>';
+
+    /* 点赞 */
+    $$('[data-like]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = btn.dataset.like;
+        var on = DB.toggleLike('sub:' + id);
+        var s = DB.find('subs', id);
+        if (s) {
+          s.likes = (s.likes || 0) + (on ? 1 : -1);
+          var list = DB.all('subs');
+          DB.saveKind('subs', list);
+          btn.textContent = (on ? '♥ ' : '♡ ') + s.likes + ' 赞';
+          btn.classList.toggle('liked', on);
+        }
+      });
+    });
+    /* 评论展开 */
+    $$('[data-comment]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var box = $('[data-cbox="' + btn.dataset.comment + '"]');
+        if (box) box.style.display = box.style.display === 'none' ? '' : 'none';
+      });
+    });
+    /* 发评论 */
+    $$('[data-csend]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var sid = btn.dataset.csend;
+        var input = $('[data-cinput="' + sid + '"]');
+        var text = input.value.trim();
+        if (!text) return U.toast('评论不能为空');
+        if (text.length > 200) return U.toast('评论过长（200字内）');
+        var list = DB.all('comments');
+        list.unshift({
+          id: DB.uid('cm'), subId: sid, nickname: '猫粉' + Math.floor(100 + Math.random() * 900),
+          content: text, date: DB.todayStr(), status: 'pending'
+        });
+        DB.saveKind('comments', list);
+        input.value = '';
+        U.toast('评论已提交，审核通过后展示');
+      });
+    });
+  }
+
+  $$('#typeTabs .filter-tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      $$('#typeTabs .filter-tab').forEach(function (t) { t.classList.remove('active'); });
+      tab.classList.add('active');
+      state.type = tab.dataset.type;
+      render();
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

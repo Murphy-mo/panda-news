@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>关于我们 / 免责声明 - 熊猫资讯</title>
+<meta name="description" content="关于熊猫资讯：本站定位、信息来源、免责声明与合规承诺。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐼</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<div class="page-hero">
+  <div class="wrap">
+    <h1>🐼 关于我们 / 免责声明</h1>
+    <p>本站为熊猫爱好者公益资讯科普站，以下声明请您知悉。</p>
+  </div>
+</div>
+
+<main class="wrap" style="max-width:820px">
+  <section class="section">
+    <div class="section-head"><span class="line"></span><h2>本站定位</h2></div>
+    <div class="card card-pad article-body">
+      <p><b>熊猫资讯（PandaDaily）</b>是圈养大熊猫垂直资讯科普网站，由熊猫爱好者运营，属<strong>非官方公益资讯站</strong>。</p>
+      <p>我们致力于：汇总全球场馆动态、记录熊猫圈大事件、建立熊猫档案库、输出科普内容，为猫粉与科普学习者提供一个干净、无广告、无交易的交流空间。</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><span class="line"></span><h2>信息来源与权威声明</h2></div>
+    <div class="card card-pad article-body">
+      <p>全站信息<strong>以官方权威为准</strong>。熊猫相关的权威信息来源包括但不限于：</p>
+      <ul>
+        <li>成都大熊猫繁育研究基地官方公告</li>
+        <li>中国大熊猫保护研究中心（卧龙/雅安/都江堰基地）官方公告</li>
+        <li>国家林业和草原局及地方主管部门发布</li>
+        <li>国内外各场馆官方发布</li>
+      </ul>
+      <p>站内内容明确区分<strong>【官方实锤】</strong>与<strong>【网传待证实】</strong>：官方实锤内容均有来源标注；网传内容仅供参考，<strong>不作为权威依据</strong>。</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><span class="line"></span><h2>免责声明</h2></div>
+    <div class="card card-pad article-body">
+      <ul>
+        <li>本站为爱好者公益资讯科普站，<strong>非官方机构</strong>，所有内容仅供爱好者交流参考，不构成任何专业建议。</li>
+        <li>如站内内容与官方公告不一致，<strong>一律以官方公告为准</strong>。</li>
+        <li>本站<strong>无电商交易、无付费、无广告、非营利</strong>；文创板块仅做信息展示，不承接任何交易。</li>
+        <li>转载内容如涉侵权，请通过站内反馈联系我们，核实后将及时处理。</li>
+        <li>本站拒绝并打击：造谣、引战、饭圈对立、恶意玩梗等行为，一经发现将删除并拉黑。</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><span class="line"></span><h2>投稿与版权</h2></div>
+    <div class="card card-pad article-body">
+      <p>所有投稿作品<strong>版权归原作者所有</strong>，本站仅做非商业公益展示。投稿即代表作者确认作品为原创或已获授权，并同意本站非商用展示协议。</p>
+      <p>发现盗图/侵权的投稿，欢迎反馈，核实后立即删除。</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><span class="line"></span><h2>联系我们 / 反馈</h2></div>
+    <div class="card card-pad">
+      <p style="font-size:14px;color:var(--ink-2)">发现错误信息、侵权内容或有改进建议，欢迎反馈：</p>
+      <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+        <input class="input" id="fbText" style="flex:1;min-width:200px" maxlength="300" placeholder="请输入反馈内容（300字内）">
+        <button class="btn btn-primary" id="btnFb">提交反馈</button>
+      </div>
+      <div style="font-size:12.5px;color:var(--ink-3);margin-top:8px">演示环境：反馈将保存在本地，正式运营请接入真实后端。</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="card card-pad" style="background:var(--green-50);border:1px solid var(--line)">
+      <b style="color:var(--green-700)">让我们一起守护国宝 🐼</b>
+      <p style="font-size:13.5px;color:var(--ink-2);margin-top:4px">理性追熊猫、拒绝饭圈化；尊重每一只圈养熊猫背后的饲养员、科研人员与所有保护工作者。</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+<div id="toast"></div>
+
+<script src="js/seed-data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script>
+(function () {
+  var U = PandaUI, $ = U.$;
+  $('#btnFb').addEventListener('click', function () {
+    var t = $('#fbText').value.trim();
+    if (!t) return U.toast('请先输入反馈内容');
+    var list = [];
+    try { list = JSON.parse(localStorage.getItem('wb_panda_v1_feedback') || '[]'); } catch (e) {}
+    list.unshift({ text: t, date: new Date().toISOString() });
+    localStorage.setItem('wb_panda_v1_feedback', JSON.stringify(list));
+    $('#fbText').value = '';
+    U.toast('感谢反馈！');
+  });
+})();
+</script>
+</body>
+</html>

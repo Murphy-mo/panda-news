@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>熊猫科普专栏 - 熊猫资讯</title>
+<meta name="description" content="熊猫科普专栏：基础认知、圈养专项、谣言辟谣、科研保护、冷知识、粉丝问答六大分类，标注难度等级。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐼</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<div class="page-hero">
+  <div class="wrap">
+    <h1>🔬 熊猫科普专栏</h1>
+    <p>六大科普分类：从新手入门到硬核科研。每篇标注难度，让你按需取用。</p>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="filter-tabs" id="catTabs">
+    <button class="filter-tab active" data-cat="">全部文章</button>
+    <button class="filter-tab" data-cat="基础认知">基础认知科普</button>
+    <button class="filter-tab" data-cat="圈养专项">圈养专项科普</button>
+    <button class="filter-tab" data-cat="谣言辟谣" style="border-color:var(--orange);color:var(--orange)">谣言辟谣</button>
+    <button class="filter-tab" data-cat="科研保护">科研保护科普</button>
+    <button class="filter-tab" data-cat="冷知识">趣味冷知识</button>
+    <button class="filter-tab" data-cat="粉丝问答">粉丝问答科普</button>
+  </div>
+
+  <div class="card card-pad" style="background:linear-gradient(120deg,#fef3e2,#fff8ec);margin-bottom:22px;display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+    <div style="font-size:34px">🛡️</div>
+    <div style="flex:1;min-width:220px">
+      <b>谣言辟谣专题</b>：汇总本站所有"熊猫谣言"辟谣文章，一键看真相。
+    </div>
+    <a class="btn btn-sm" style="background:var(--orange);color:#fff" href="rumor.html">进入辟谣专题 →</a>
+  </div>
+
+  <div class="grid grid-2" id="grid"></div>
+
+  <section class="section">
+    <div class="card card-pad" style="background:var(--bg-soft);display:flex;gap:14px;align-items:center;flex-wrap:wrap">
+      <div style="font-size:34px">❓</div>
+      <div style="flex:1;min-width:220px">
+        <b>有熊猫问题想问？</b>提交你的问题，经后台审核后可能生成"粉丝问答"科普文章。
+      </div>
+      <a class="btn btn-outline btn-sm" href="submit.html?type=question">去提问 →</a>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+<div id="toast"></div>
+
+<script src="js/seed-data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script>
+(function () {
+  var DB = PandaDB, U = PandaUI, esc = U.esc, $ = U.$, $$ = U.$$;
+  var state = { cat: '' };
+
+  function diffCls(d) {
+    return d === '硬核科研' ? 'purple' : d === '进阶干货' ? 'orange' : 'blue';
+  }
+
+  function render() {
+    var list = DB.all('articles').filter(function (a) { return !state.cat || a.category === state.cat; })
+      .sort(function (a, b) { return a.date < b.date ? 1 : -1; });
+    $('#grid').innerHTML = list.length ? list.map(function (a) {
+      var rel = [];
+      if (a.relatedPanda) { var pp = DB.find('pandas', a.relatedPanda); if (pp) rel.push('<span class="tag green">🐼 ' + esc(pp.name) + '</span>'); }
+      if (a.relatedVenue) { var vv = DB.find('venues', a.relatedVenue); if (vv) rel.push('<span class="tag blue">🏛️ ' + esc(vv.name) + '</span>'); }
+      return '<div class="card card-pad">' +
+        '<div class="card-meta" style="margin-top:0"><span class="tag green">' + esc(a.category) + '</span><span class="tag ' + diffCls(a.difficulty) + '">' + esc(a.difficulty) + '</span>' + rel.join('') + '</div>' +
+        '<div class="card-title" style="margin-top:8px;font-size:16px"><a href="article.html?id=' + a.id + '">' + esc(a.title) + '</a></div>' +
+        '<div class="card-meta">' + a.date + ' · 来源：' + esc(a.source) + '</div></div>';
+    }).join('') : '<div class="empty" style="grid-column:1/-1"><div class="big">📚</div>该分类下暂无文章</div>';
+  }
+
+  $$('#catTabs .filter-tab').forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      $$('#catTabs .filter-tab').forEach(function (t) { t.classList.remove('active'); });
+      tab.classList.add('active');
+      state.cat = tab.dataset.cat;
+      render();
+    });
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

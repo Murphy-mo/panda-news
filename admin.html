@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>熊猫资讯 · 后台CMS</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐼</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="wrap navbar">
+    <a class="logo" href="admin.html"><span class="logo-icon">🛠️</span>熊猫资讯 CMS</a>
+    <div style="margin-left:auto;display:flex;gap:8px;align-items:center">
+      <a class="btn btn-ghost btn-sm" href="index.html" target="_blank">查看前台 ↗</a>
+      <button class="btn btn-outline btn-sm" id="btnLogout" style="display:none">退出登录</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <!-- 登录 -->
+  <div id="loginView">
+    <div class="card card-pad cms-login-card">
+      <div class="big">🔐</div>
+      <h2 style="margin-bottom:6px">后台管理登录</h2>
+      <p style="font-size:13px;color:var(--ink-3);margin-bottom:18px">演示环境默认密码：panda2024（可在设置中修改）<br>提示：纯前端登录仅用于防误操作，正式上线请务必接入真实后端鉴权。</p>
+      <div class="form-item"><input class="input" type="password" id="pwd" placeholder="输入管理密码"></div>
+      <button class="btn btn-primary btn-block" id="btnLogin">登 录</button>
+    </div>
+  </div>
+
+  <!-- 管理界面 -->
+  <div id="cmsView" style="display:none">
+    <div class="cms-layout">
+      <aside class="cms-side" id="sideNav">
+        <a href="#dashboard" data-sec="dashboard">📊 仪表盘</a>
+        <a href="#subs" data-sec="subs">📥 投稿审核</a>
+        <a href="#comments" data-sec="comments">💬 评论审核</a>
+        <a href="#articles" data-sec="articles">📚 科普文章</a>
+        <a href="#events" data-sec="events">📅 大事件</a>
+        <a href="#culture" data-sec="culture">🎁 文创内容</a>
+        <a href="#venues" data-sec="venues">🏛️ 场馆管理</a>
+        <a href="#pandas" data-sec="pandas">📖 熊猫档案</a>
+        <a href="#star" data-sec="star">⭐ 今日主角</a>
+        <a href="#settings" data-sec="settings">⚙️ 站点设置</a>
+      </aside>
+      <main id="secContent"></main>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<div id="modalMask" class="modal-mask"></div>
+
+<script src="js/seed-data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>熊猫档案库 - 熊猫资讯</title>
+<meta name="description" content="全站熊猫档案库：按谱系号、姓名、场馆检索全部圈养熊猫档案，支持随机查看。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐼</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<div class="page-hero">
+  <div class="wrap">
+    <h1>📖 熊猫档案库</h1>
+    <p>全部圈养大熊猫档案检索：支持按姓名、谱系号、场馆搜索，随机换一只看看。</p>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="search-bar" style="margin-top:22px">
+    <input class="input" id="kw" placeholder="搜索姓名 / 谱系号 / 昵称，如：花花、1237、福宝" />
+    <select class="select" id="genderSel" style="max-width:130px">
+      <option value="">全部性别</option>
+      <option value="♀">雌性 ♀</option>
+      <option value="♂">雄性 ♂</option>
+    </select>
+    <select class="select" id="venueSel" style="max-width:230px"><option value="">全部场馆</option></select>
+    <button class="btn btn-primary" id="btnSearch">搜索</button>
+    <button class="btn btn-outline" id="btnRandom">🎲 随机档案</button>
+    <button class="btn btn-ghost" id="btnReset">重置</button>
+  </div>
+  <div style="font-size:12.5px;color:var(--ink-3);margin-top:8px" id="count"></div>
+
+  <div class="grid grid-3" style="margin-top:14px" id="grid"></div>
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+<div id="toast"></div>
+
+<script src="js/seed-data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script>
+(function () {
+  var DB = PandaDB, U = PandaUI, esc = U.esc, $ = U.$, $$ = U.$$;
+  var state = { kw: '', gender: '', venue: '' };
+
+  /* 场馆下拉 */
+  var venueSel = $('#venueSel');
+  var venueOpts = '<option value="">全部场馆</option>' + DB.all('venues').map(function (v) {
+    return '<option value="' + v.id + '">' + esc(v.name) + '</option>';
+  }).join('');
+  venueSel.innerHTML = venueOpts;
+
+  function pandaCard(p) {
+    var venue = DB.find('venues', p.venue);
+    return '<a class="card" href="panda-detail.html?id=' + p.id + '" style="color:inherit">' +
+      '<div class="panda-avatar">' + U.pandaSVG(p.name, p.id, { w: 480 }) + '</div>' +
+      '<div class="card-pad">' +
+      '<div class="card-title" style="font-size:17px">' + esc(p.name) + ' <span style="color:var(--ink-3);font-size:12.5px">' + esc(p.nick || '') + '</span></div>' +
+      '<div class="card-meta"><span>' + esc(p.gender) + ' ' + esc(p.birthday) + '</span><span>谱系号 ' + esc(p.studbook) + '</span></div>' +
+      '<div class="card-meta">📍 ' + esc(venue ? venue.name : '') + '</div>' +
+      '<div class="card-desc">' + esc(U.chunk(p.feature, 42)) + '</div>' +
+      '</div></a>';
+  }
+
+  function render() {
+    var list = DB.all('pandas').filter(function (p) {
+      if (state.gender && p.gender !== state.gender) return false;
+      if (state.venue && p.venue !== state.venue) return false;
+      if (state.kw) {
+        var venue = DB.find('venues', p.venue);
+        var hay = (p.name + p.nick + p.studbook + p.parents + (venue ? venue.name : '')).toLowerCase();
+        if (hay.indexOf(state.kw.toLowerCase()) < 0) return false;
+      }
+      return true;
+    });
+    $('#count').textContent = '共 ' + list.length + ' 只熊猫档案';
+    $('#grid').innerHTML = list.length ? list.map(pandaCard).join('')
+      : '<div class="empty" style="grid-column:1/-1"><div class="big">🔍</div>没有找到匹配的熊猫档案</div>';
+  }
+
+  $('#btnSearch').addEventListener('click', function () {
+    state.kw = $('#kw').value.trim();
+    state.gender = $('#genderSel').value;
+    state.venue = $('#venueSel').value;
+    render();
+  });
+  $('#kw').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('#btnSearch').click(); });
+  $('#genderSel').addEventListener('change', function () { state.gender = this.value; render(); });
+  $('#venueSel').addEventListener('change', function () { state.venue = this.value; render(); });
+  $('#btnReset').addEventListener('click', function () {
+    state = { kw: '', gender: '', venue: '' };
+    $('#kw').value = ''; $('#genderSel').value = ''; $('#venueSel').value = '';
+    render();
+  });
+  $('#btnRandom').addEventListener('click', function () {
+    var list = DB.all('pandas');
+    if (!list.length) return U.toast('档案库为空');
+    var r = list[Math.floor(Math.random() * list.length)];
+    location.href = 'panda-detail.html?id=' + r.id;
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

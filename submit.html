@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>投稿作品 - 熊猫资讯</title>
+<meta name="description" content="向熊猫资讯投稿：实拍作品、观展游记、科普短文、手绘二创，或提交科普问题。投稿需审核后展示。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐼</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<div class="page-hero">
+  <div class="wrap">
+    <h1>📝 投稿作品 / 提问</h1>
+    <p>支持文字、图片（示意图）、短视频链接的图文混合投稿。提交后需后台人工审核，通过后展示在社区。</p>
+  </div>
+</div>
+
+<main class="wrap" style="max-width:720px">
+  <div class="card card-pad" style="margin-top:24px">
+    <form id="form" novalidate>
+      <div class="form-item">
+        <label class="form-label">投稿类型<span class="req">*</span></label>
+        <div class="form-radio-row" id="typeRow">
+          <span class="radio-chip" data-t="实拍作品">📷 实拍作品</span>
+          <span class="radio-chip" data-t="观展游记">🎫 观展游记</span>
+          <span class="radio-chip" data-t="科普短文">📄 科普短文</span>
+          <span class="radio-chip" data-t="手绘二创">🎨 手绘二创</span>
+          <span class="radio-chip" data-t="提问问答">❓ 科普提问</span>
+        </div>
+        <input type="hidden" id="typeInput" value="实拍作品">
+      </div>
+
+      <div class="form-item">
+        <label class="form-label">标题<span class="req">*</span></label>
+        <input class="input" id="title" maxlength="50" placeholder="一句话描述你的作品/问题（50字内）">
+      </div>
+
+      <div class="form-item">
+        <label class="form-label">昵称<span class="req">*</span></label>
+        <input class="input" id="nick" maxlength="16" placeholder="展示用昵称（16字内），如：竹子不胖">
+      </div>
+
+      <div class="form-item">
+        <label class="form-label">正文内容<span class="req">*</span></label>
+        <textarea class="textarea" id="content" maxlength="1000" placeholder="写点内容吧（1000字内）。科普提问请直接描述你的问题：如“熊猫的怀孕期是多长？”"></textarea>
+      </div>
+
+      <div class="form-item" id="imgBox">
+        <label class="form-label">配图（选填 · 演示环境用示意图）</label>
+        <div class="form-radio-row">
+          <span class="radio-chip img-chip" data-i="">无图</span>
+          <span class="radio-chip img-chip" data-i="scene1">🏞️ 园内场景</span>
+          <span class="radio-chip img-chip" data-i="scene2">🐼 熊猫特写</span>
+          <span class="radio-chip img-chip" data-i="scene3">✍️ 手绘风格</span>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap" id="imgPreview"></div>
+      </div>
+
+      <div class="form-item" id="videoBox" style="display:none">
+        <label class="form-label">短视频链接（选填）</label>
+        <input class="input" id="video" placeholder="https://…（仅存放链接展示，需可公开访问且不侵权）">
+        <div class="form-hint">本站不托管视频文件，仅存外链，请确保链接合法可访问。</div>
+      </div>
+
+      <div class="form-item">
+        <label class="check-item"><input type="checkbox" id="ck1"> 我已确认：作品为本人原创或已获原作者授权，无盗图、无侵权行为。<span class="req">*</span></label>
+        <label class="check-item" style="margin-top:8px"><input type="checkbox" id="ck2"> 我同意：作品在熊猫资讯站内作非商业公益展示，版权仍归本人所有。<span class="req">*</span></label>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block" id="btnSubmit" style="padding:12px">提交投稿（需审核后展示）</button>
+      <div class="form-hint" style="text-align:center;margin-top:8px">提交即表示同意社区守则：不引战、不造谣、不发布违规内容。</div>
+    </form>
+  </div>
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+<div id="toast"></div>
+
+<script src="js/seed-data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script>
+(function () {
+  var DB = PandaDB, U = PandaUI, $ = U.$, $$ = U.$$;
+  var selType = '实拍作品', selImg = '';
+
+  /* 支持 ?type=question 快捷入口 */
+  if (new URLSearchParams(location.search).get('type') === 'question') {
+    selType = '提问问答';
+    $$('#typeRow .radio-chip').forEach(function (c) { c.classList.toggle('active', c.dataset.t === '提问问答'); });
+    $('#typeInput').value = '提问问答';
+  }
+
+  $$('#typeRow .radio-chip').forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      $$('#typeRow .radio-chip').forEach(function (c) { c.classList.remove('active'); });
+      chip.classList.add('active');
+      selType = chip.dataset.t;
+      $('#typeInput').value = selType;
+      $('#videoBox').style.display = selType === '实拍作品' ? '' : 'none';
+      if (selType === '提问问答') { $('#imgBox').style.display = 'none'; } else { $('#imgBox').style.display = ''; }
+    });
+  });
+
+  $$('.img-chip').forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      $$('.img-chip').forEach(function (c) { c.classList.remove('active'); });
+      chip.classList.add('active');
+      selImg = chip.dataset.i;
+      $('#imgPreview').innerHTML = selImg
+        ? '<div style="width:160px">' + U.pandaSVG('预览', selImg, { w: 320 }) + '</div>'
+        : '';
+    });
+  });
+
+  $('#form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var title = $('#title').value.trim();
+    var nick = $('#nick').value.trim();
+    var content = $('#content').value.trim();
+    if (!title) return U.toast('请填写标题');
+    if (!nick) return U.toast('请填写昵称');
+    if (!content) return U.toast('请填写正文内容');
+    if (!$('#ck1').checked || !$('#ck2').checked) return U.toast('请先勾选版权授权与非商用展示协议');
+
+    var list = DB.all('subs');
+    list.unshift({
+      id: DB.uid('s'),
+      type: selType === '提问问答' ? '提问问答' : selType,
+      nickname: nick,
+      date: DB.todayStr(),
+      title: title,
+      content: content,
+      images: selImg ? [selImg] : [],
+      video: $('#video').value.trim() || '',
+      status: 'pending',
+      featured: false,
+      likes: 0,
+      copyright: true
+    });
+    DB.saveKind('subs', list);
+    $('#form').reset();
+    U.toast('投稿已提交，审核通过后将在社区展示');
+    setTimeout(function () { location.href = 'community.html'; }, 1500);
+  });
+})();
+</script>
+</body>
+</html>

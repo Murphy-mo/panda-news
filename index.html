@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>熊猫资讯 PandaDaily - 圈养大熊猫垂直资讯科普公益站</title>
+<meta name="description" content="熊猫资讯：全球熊猫馆动态、熊猫圈大事件、熊猫档案库、科普专栏与猫粉社区的公益资讯站。所有权威信息以官方公告为准。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐼</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<main class="wrap">
+  <!-- 顶部横幅 -->
+  <div class="hero-banner">
+    <div class="hero-text">
+      <h2>🐼 熊猫资讯 · 让每一只圈养熊猫都被看见</h2>
+      <p>圈养大熊猫垂直资讯科普公益站：全球场馆动态、熊猫圈大事件、熊猫档案库、科普专栏与猫粉社区。本站为爱好者公益站，所有权威信息以官方公告为准。</p>
+      <p style="margin-top:12px">
+        <a class="btn btn-primary btn-sm" href="star.html">查看今日主角</a>
+        <a class="btn btn-outline btn-sm" href="submit.html" style="margin-left:8px">我要投稿</a>
+      </p>
+    </div>
+    <div class="hero-emoji">🐼</div>
+  </div>
+
+  <!-- 今日主角 -->
+  <section class="section">
+    <div class="section-head"><span class="line"></span><h2>今日主角 · 每日熊猫档案</h2><a class="more" href="archive.html">全部档案 →</a></div>
+    <div id="todayStar"></div>
+  </section>
+
+  <!-- 六大板块入口 -->
+  <section class="section">
+    <div class="grid grid-3" id="boards">
+      <a class="card card-pad" href="zoo.html" style="color:inherit">
+        <div style="font-size:30px">🏛️</div><div class="card-title" style="margin-top:8px">全球熊猫馆动态</div>
+        <div class="card-desc">国内外场馆索引、馆内熊猫名单、最新动态速递</div>
+      </a>
+      <a class="card card-pad" href="events.html" style="color:inherit">
+        <div style="font-size:30px">📅</div><div class="card-title" style="margin-top:8px">熊猫圈大事件</div>
+        <div class="card-desc">时间线大事记，标注【官方实锤】与【网传待证实】</div>
+      </a>
+      <a class="card card-pad" href="culture.html" style="color:inherit">
+        <div style="font-size:30px">🎁</div><div class="card-title" style="margin-top:8px">熊猫文创专栏</div>
+        <div class="card-desc">官方上新、限量文创、正版测评与盗版避雷</div>
+      </a>
+      <a class="card card-pad" href="science.html" style="color:inherit">
+        <div style="font-size:30px">🔬</div><div class="card-title" style="margin-top:8px">熊猫科普专栏</div>
+        <div class="card-desc">六大科普分类，辟谣专题，从入门到硬核</div>
+      </a>
+      <a class="card card-pad" href="community.html" style="color:inherit">
+        <div style="font-size:30px">💬</div><div class="card-title" style="margin-top:8px">猫粉投稿社区</div>
+        <div class="card-desc">实拍作品、观展游记、手绘二创，点赞评论交流</div>
+      </a>
+      <a class="card card-pad" href="archive.html" style="color:inherit">
+        <div style="font-size:30px">📖</div><div class="card-title" style="margin-top:8px">熊猫档案库</div>
+        <div class="card-desc">谱系号检索、随机档案、成长大事记与名场面</div>
+      </a>
+    </div>
+  </section>
+
+  <!-- 最新大事件 -->
+  <section class="section">
+    <div class="section-head"><span class="line"></span><h2>熊猫圈大事件 · 快讯</h2><a class="more" href="events.html">时间线全览 →</a></div>
+    <div id="topEvents"></div>
+  </section>
+
+  <!-- 最新科普 -->
+  <section class="section">
+    <div class="section-head"><span class="line"></span><h2>最新科普</h2><a class="more" href="science.html">科普专栏 →</a></div>
+    <div class="grid grid-2" id="topArticles"></div>
+  </section>
+
+  <!-- 场馆动态 -->
+  <section class="section">
+    <div class="section-head"><span class="line"></span><h2>场馆动态</h2><a class="more" href="zoo.html">全部场馆 →</a></div>
+    <div class="grid grid-2" id="venueNews"></div>
+  </section>
+
+  <!-- 精选投稿 -->
+  <section class="section">
+    <div class="section-head"><span class="line"></span><h2>猫粉精选投稿</h2><a class="more" href="community.html">社区 →</a></div>
+    <div class="grid grid-3" id="topSubs"></div>
+  </section>
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+<div id="toast"></div>
+
+<script src="js/seed-data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script>
+(function () {
+  var DB = PandaDB, U = PandaUI, esc = U.esc;
+  var $ = U.$, $$ = U.$$;
+
+  /* ---- 今日主角 ---- */
+  var starBox = $('#todayStar');
+  var star = DB.todayStar();
+  if (star && star.panda) {
+    var p = star.panda;
+    var venue = DB.find('venues', p.venue);
+    starBox.innerHTML =
+      '<div class="star-card-big" style="display:flex;gap:24px;align-items:center;flex-wrap:wrap">' +
+      '<div style="width:170px;flex-shrink:0">' + U.pandaSVG(p.name, p.id, { w: 340 }) + '</div>' +
+      '<div style="flex:1;min-width:240px;position:relative;z-index:1">' +
+      '<span class="star-flag">📅 今日主角 · ' + star.date + '</span>' +
+      '<h3>' + esc(p.name) + ' <span style="font-size:16px;color:rgba(255,255,255,.8)">' + esc(p.nick || '') + '</span></h3>' +
+      '<div class="star-sub">' + esc(p.intro) + '</div>' +
+      '<div class="star-stats">' +
+      '<span><b>' + esc(p.gender) + '</b>性别</span>' +
+      '<span><b>' + esc(p.birthday) + '</b>出生日期</span>' +
+      '<span><b>谱系号 ' + esc(p.studbook) + '</b>唯一编号</span>' +
+      '<span><b>' + esc(venue ? venue.name : '') + '</b>现居</span>' +
+      '</div>' +
+      '<div style="margin-top:16px">' +
+      '<a class="btn btn-white btn-sm" href="panda-detail.html?id=' + p.id + '">查看完整档案 →</a>' +
+      '<a class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;margin-left:8px" href="star.html">今日主角专题</a>' +
+      '</div>' +
+      '</div></div>';
+  }
+
+  /* ---- 最新大事件（置顶优先） ---- */
+  var evBox = $('#topEvents');
+  var events = DB.all('events').slice().sort(function (a, b) {
+    return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || (a.date < b.date ? 1 : -1);
+  }).slice(0, 5);
+  evBox.innerHTML = events.map(function (e) {
+    var badge = e.status === 'official'
+      ? '<span class="badge-status badge-official">官方实锤</span>'
+      : '<span class="badge-status badge-rumor">网传待证实</span>';
+    return '<div class="card card-pad" style="margin-bottom:10px;display:flex;gap:12px;align-items:center;flex-wrap:wrap">' +
+      '<span style="font-size:13px;color:var(--green-600);font-weight:700;white-space:nowrap">' + e.date + '</span>' +
+      badge +
+      '<span class="tag gray">' + esc(e.tag) + '</span>' +
+      '<span style="flex:1;min-width:200px"><a href="events.html" style="color:var(--ink);font-weight:600">' + esc(e.title) + '</a></span>' +
+      '<a class="btn btn-ghost btn-sm" href="events.html">详情 →</a>' +
+      '</div>';
+  }).join('');
+
+  /* ---- 最新科普 ---- */
+  var artBox = $('#topArticles');
+  var arts = DB.all('articles').slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; }).slice(0, 4);
+  artBox.innerHTML = arts.map(function (a) {
+    return '<div class="card card-pad">' +
+      '<div class="card-meta"><span class="tag green">' + esc(a.category) + '</span><span class="tag ' + (a.difficulty === '硬核科研' ? 'purple' : a.difficulty === '进阶干货' ? 'orange' : 'blue') + '">' + esc(a.difficulty) + '</span></div>' +
+      '<div class="card-title" style="margin-top:8px"><a href="science.html">' + esc(a.title) + '</a></div>' +
+      '<div class="card-meta">' + a.date + ' · 来源：' + esc(a.source) + '</div>' +
+      '</div>';
+  }).join('');
+
+  /* ---- 场馆动态（按时间倒序取 4 条） ---- */
+  var vnBox = $('#venueNews');
+  var allNews = [];
+  DB.all('venues').forEach(function (v) {
+    (v.dynamics || []).forEach(function (d) {
+      allNews.push({ venue: v, d: d });
+    });
+  });
+  allNews.sort(function (a, b) { return a.d.date < b.d.date ? 1 : -1; });
+  vnBox.innerHTML = allNews.slice(0, 4).map(function (x) {
+    return '<a class="card card-pad" href="zoo-detail.html?id=' + x.venue.id + '" style="color:inherit">' +
+      '<div class="card-meta"><span class="tag green">' + esc(x.venue.name) + '</span><span>' + x.d.date + '</span></div>' +
+      '<div class="card-title" style="margin-top:8px">' + esc(x.d.title) + '</div>' +
+      '<div class="card-desc">' + esc(U.chunk(x.d.text, 60)) + '</div>' +
+      '<div class="card-meta">来源：' + esc(x.d.source) + '</div>' +
+      '</a>';
+  }).join('');
+
+  /* ---- 精选投稿 ---- */
+  var subBox = $('#topSubs');
+  var subs = DB.all('subs').filter(function (s) { return s.status === 'approved'; })
+    .sort(function (a, b) { return (b.featured ? 1 : 0) - (a.featured ? 1 : 0); });
+  subBox.innerHTML = subs.slice(0, 3).map(function (s) {
+    var img = s.images && s.images.length
+      ? U.pandaSVG(s.nickname, s.id + s.images[0], { name: false })
+      : '';
+    return '<a class="card" href="community.html" style="color:inherit">' +
+      (img ? '<div class="panda-avatar">' + img + '</div>' : '') +
+      '<div class="card-pad">' +
+      '<div class="card-meta"><span class="tag ' + (s.featured ? 'orange' : 'green') + '">' + (s.featured ? '★ 月度精选' : esc(s.type)) + '</span></div>' +
+      '<div class="card-title" style="margin-top:8px">' + esc(s.title) + '</div>' +
+      '<div class="card-desc">' + esc(U.chunk(s.content, 50)) + '</div>' +
+      '<div class="card-meta">' + esc(s.nickname) + ' · ' + U.timeAgo(s.date) + '</div>' +
+      '</div></a>';
+  }).join('');
+})();
+</script>
+</body>
+</html>

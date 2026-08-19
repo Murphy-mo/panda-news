@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>谣言辟谣专题 - 熊猫资讯</title>
+<meta name="description" content="熊猫谣言辟谣合集：汇总本站所有辟谣科普，谣言与真相对照呈现。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐼</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<div class="page-hero">
+  <div class="wrap">
+    <h1>🛡️ 谣言辟谣专题</h1>
+    <p>汇总本站所有"熊猫谣言"辟谣科普，谣言与真相对照，理性爱熊猫。</p>
+  </div>
+</div>
+
+<main class="wrap">
+  <div id="rumorList"></div>
+
+  <div class="card card-pad" style="margin-top:24px;background:var(--bg-soft)">
+    <b style="color:var(--ink)">遇到拿不准的"熊猫消息"怎么办？</b>
+    <p style="font-size:14px;color:var(--ink-2);margin-top:6px">① 看来源：是否来自官方账号（基地、林草局、场馆官方）；② 看日期：旧闻新发是常见手法；③ 看交叉验证：多官方渠道是否一致。不确定的内容，宁可等官方回应，也别急着转发。</p>
+  </div>
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+<div id="toast"></div>
+
+<script src="js/seed-data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script>
+(function () {
+  var DB = PandaDB, U = PandaUI, esc = U.esc, $ = U.$;
+  var list = DB.all('articles').filter(function (a) { return a.category === '谣言辟谣'; });
+  $('#rumorList').innerHTML = list.length ? list.map(function (a) {
+    return '<div class="card card-pad" style="margin-bottom:14px">' +
+      '<div class="card-meta"><span class="tag orange">谣言辟谣</span><span class="tag ' + (a.difficulty === '硬核科研' ? 'purple' : 'blue') + '">' + esc(a.difficulty) + '</span><span>' + a.date + '</span></div>' +
+      '<div class="card-title" style="margin-top:8px;font-size:16px"><a href="article.html?id=' + a.id + '">' + esc(a.title) + '</a></div>' +
+      '<div class="card-desc">' + esc(U.chunk(a.content.replace(/<[^>]+>/g, ' '), 90)) + '</div>' +
+      '<div style="margin-top:10px"><a class="btn btn-primary btn-sm" href="article.html?id=' + a.id + '">阅读辟谣全文 →</a></div></div>';
+  }).join('') : '<div class="empty"><div class="big">✅</div>暂无辟谣文章</div>';
+})();
+</script>
+</body>
+</html>

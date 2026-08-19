@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>今日主角 - 每日熊猫档案 - 熊猫资讯</title>
+<meta name="description" content="今日主角：每日0点自动切换的熊猫档案专题，含成长大事记、名场面趣闻与精选图库。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐼</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<div class="page-hero">
+  <div class="wrap">
+    <h1>⭐ 今日主角 · 每日熊猫档案</h1>
+    <p>每天一位圈养大熊猫档案主角，每日0点自动切换。可查看完整档案、随机换一只、回看往期。</p>
+  </div>
+</div>
+
+<main class="wrap">
+  <!-- 今日主角大卡 -->
+  <div id="todayCard"></div>
+
+  <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+    <button class="btn btn-outline" id="btnRandom">🎲 随机一只熊猫</button>
+    <button class="btn btn-ghost" id="btnPrev">◀ 昨日主角</button>
+    <button class="btn btn-ghost" id="btnNext">明日主角 ▶</button>
+    <a class="btn btn-primary" href="archive.html" style="margin-left:auto">进入档案库检索 →</a>
+  </div>
+
+  <!-- 成长大事记 -->
+  <section class="section">
+    <div class="section-head"><span class="line"></span><h2>成长大事记</h2></div>
+    <div id="timeline" class="timeline" style="max-width:760px"></div>
+  </section>
+
+  <!-- 名场面趣闻 -->
+  <section class="section">
+    <div class="section-head"><span class="line"></span><h2>名场面 · 趣闻</h2></div>
+    <div class="grid grid-2" id="stories"></div>
+  </section>
+
+  <!-- 精选图库 -->
+  <section class="section">
+    <div class="section-head"><span class="line"></span><h2>精选图库</h2></div>
+    <div class="grid grid-4" id="gallery"></div>
+  </section>
+
+  <!-- 关联科普 -->
+  <section class="section">
+    <div class="section-head"><span class="line"></span><h2>关联科普</h2></div>
+    <div id="relatedArts" class="grid grid-2"></div>
+  </section>
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+<div id="toast"></div>
+
+<script src="js/seed-data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script>
+(function () {
+  var DB = PandaDB, U = PandaUI, esc = U.esc, $ = U.$, $$ = U.$$;
+  var state = { dateOffset: 0, panda: null };
+
+  function render() {
+    var target = new Date();
+    target.setDate(target.getDate() + state.dateOffset);
+    var ds = DB.todayStr(state.dateOffset);
+    var star;
+    if (state.dateOffset === 0) {
+      star = DB.todayStar();
+    } else {
+      var pandas = DB.all('pandas');
+      star = { panda: DB.pickByDate ? DB.pickByDate(pandas, ds, 'star') : null, date: ds, manual: false };
+    }
+    if (!star || !star.panda) {
+      $('#todayCard').innerHTML = '<div class="empty"><div class="big">🐼</div>档案库暂无数据，请先在后台录入熊猫档案</div>';
+      return;
+    }
+    var p = star.panda;
+    state.panda = p;
+    var venue = DB.find('venues', p.venue);
+    var starDate = ds;
+
+    $('#todayCard').innerHTML =
+      '<div class="star-card-big" style="display:flex;gap:28px;align-items:center;flex-wrap:wrap;padding:34px">' +
+      '<div style="width:200px;flex-shrink:0">' + U.pandaSVG(p.name, p.id, { w: 400 }) + '</div>' +
+      '<div style="flex:1;min-width:260px;position:relative;z-index:1">' +
+      '<span class="star-flag">📅 主角日期：' + starDate + (state.dateOffset === 0 ? '（今日 · 每日0点自动切换）' : '') + '</span>' +
+      '<h3>' + esc(p.name) + ' <span style="font-size:15px;color:rgba(255,255,255,.85)">' + esc(p.nick || '') + '</span></h3>' +
+      '<div class="star-sub">' + esc(p.intro) + '</div>' +
+      '<div class="star-stats">' +
+      '<span><b>' + esc(p.gender) + '</b>性别</span>' +
+      '<span><b>' + esc(p.birthday) + '</b>出生</span>' +
+      '<span><b>谱系号 ' + esc(p.studbook) + '</b>唯一编号</span>' +
+      '</div>' +
+      '<div class="star-stats">' +
+      '<span><b>' + esc(p.parents) + '</b></span>' +
+      '<span><b>' + esc(venue ? venue.name : '') + '</b>现居</span>' +
+      '</div>' +
+      '<div style="margin-top:18px">' +
+      '<a class="btn btn-white btn-sm" href="panda-detail.html?id=' + p.id + '">查看完整档案 →</a>' +
+      '</div></div></div>';
+
+    /* 大事记 */
+    $('#timeline').innerHTML = (p.timeline || []).slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; })
+      .map(function (t) {
+        return '<div class="tl-item"><div class="tl-date">' + t.date + '</div><div style="font-size:14px;color:var(--ink)">' + esc(t.text) + '</div></div>';
+      }).join('') || '<div class="empty" style="padding:20px"><div class="big">🌱</div>档案建设中</div>';
+
+    /* 趣闻 */
+    $('#stories').innerHTML = (p.stories || []).map(function (s) {
+      return '<div class="card card-pad"><div class="card-title">✨ ' + esc(s.title) + '</div><div class="card-desc">' + esc(s.text) + '</div></div>';
+    }).join('') || '<div class="empty" style="grid-column:1/-1"><div class="big">🍃</div>趣闻整理中</div>';
+
+    /* 图库 */
+    var imgs = ['a', 'b', 'c', 'd', 'e', 'f'];
+    $('#gallery').innerHTML = imgs.slice(0, 4).map(function (k) {
+      return '<div class="panda-avatar">' + U.pandaSVG(p.name, p.id + k, { w: 480, name: false, bg: ['#e8f5e9', '#f1f8e9', '#e0f2f1', '#f9fbe7'][k.charCodeAt(0) % 4] }) + '</div>';
+    }).join('');
+
+    /* 关联科普 */
+    var arts = DB.all('articles').filter(function (a) { return a.relatedPanda === p.id; })
+      .concat(DB.all('articles').filter(function (a) { return a.relatedVenue && venue && a.relatedVenue === venue.id; }));
+    var seen = {}, uniq = [];
+    arts.forEach(function (a) { if (!seen[a.id]) { seen[a.id] = 1; uniq.push(a); } });
+    $('#relatedArts').innerHTML = uniq.length ? uniq.map(function (a) {
+      return '<a class="card card-pad" href="article.html?id=' + a.id + '" style="color:inherit">' +
+        '<div class="card-meta"><span class="tag green">' + esc(a.category) + '</span><span class="tag blue">' + esc(a.difficulty) + '</span></div>' +
+        '<div class="card-title" style="margin-top:8px">' + esc(a.title) + '</div></a>';
+    }).join('') : '<div class="empty" style="grid-column:1/-1"><div class="big">📚</div>暂无关联科普文章</div>';
+  }
+
+  $('#btnRandom').addEventListener('click', function () {
+    var pandas = DB.all('pandas');
+    if (!pandas.length) return U.toast('档案库为空');
+    var r = pandas[Math.floor(Math.random() * pandas.length)];
+    location.href = 'panda-detail.html?id=' + r.id;
+  });
+  $('#btnPrev').addEventListener('click', function () { state.dateOffset -= 1; render(); });
+  $('#btnNext').addEventListener('click', function () { state.dateOffset += 1; render(); });
+
+  render();
+})();
+</script>
+</body>
+</html>

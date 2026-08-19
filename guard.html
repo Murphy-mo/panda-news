@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>文创避雷专区 - 熊猫资讯</title>
+<meta name="description" content="熊猫文创避雷专区：盗版辨别科普与避坑指南，守护你的钱包与熊猫公益。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐼</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<div class="page-hero">
+  <div class="wrap">
+    <h1>🛡️ 文创避雷专区</h1>
+    <p>盗版辨别科普与避坑指南。本站不参与交易，以下内容为爱好者经验整理，供参考。</p>
+  </div>
+</div>
+
+<main class="wrap">
+  <section class="section">
+    <div class="section-head"><span class="line"></span><h2>盗版文创常见破绽</h2></div>
+    <div class="grid grid-2" id="pitfalls"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><span class="line"></span><h2>避坑指南</h2></div>
+    <div class="card card-pad article-body" id="guide"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><span class="line"></span><h2>本站收录的避雷资讯</h2></div>
+    <div id="guardList"></div>
+  </section>
+
+  <div style="margin-top:28px;text-align:center">
+    <a class="btn btn-outline" href="culture.html">← 返回文创专栏</a>
+  </div>
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+<div id="toast"></div>
+
+<script src="js/seed-data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script>
+(function () {
+  var DB = PandaDB, U = PandaUI, esc = U.esc, $ = U.$;
+
+  $('#pitfalls').innerHTML = [
+    { t: '看授权标识', d: '正版熊猫文创通常带官方授权标（LOGO吊牌、防伪码、编号）。电商页只字不提"授权"、模糊出品方的，大概率是盗版。' },
+    { t: '看价格', d: '明显低于官方定价（如官方玩偶198元、盗版卖39元包邮）的，基本可判定为盗版。熊猫文创成本不低，低价必有猫腻。' },
+    { t: '看细节', d: '盗版常见问题：图案模糊、缝线粗糙、填充物异味、色差严重。官方品控稳定，细节经得起放大。' },
+    { t: '看出品方', d: '只写"动物园周边""熊猫玩偶"却不写明具体出品机构的，警惕。正版会明确标注：成都基地官方文创、某某中心授权等。' }
+  ].map(function (p) {
+    return '<div class="card card-pad"><div class="card-title">🔍 ' + esc(p.t) + '</div><div class="card-desc">' + esc(p.d) + '</div></div>';
+  }).join('');
+
+  $('#guide').innerHTML =
+    '<h3>三步买正版</h3><ul>' +
+    '<li>第一步：只从场馆官方渠道购买——基地官网/官方旗舰店/园区内文创店</li>' +
+    '<li>第二步：购买前确认授权标识与出品方名称，索要或核实授权信息</li>' +
+    '<li>第三步：保留购物凭证，发现问题向官方渠道反馈，勿在非官方渠道"维权无门"</li>' +
+    '</ul>' +
+    '<h3>为什么要支持正版</h3>' +
+    '<p>官方文创收益会投入大熊猫科研与保护公益。买盗版不仅伤害创作者，还让真正做保护的机构失去资金来源。支持正版 = 支持熊猫保护本身。</p>' +
+    '<blockquote>特别提醒：网上所谓"同款复刻""原单尾货"几乎都是盗版话术，请勿轻信。</blockquote>';
+
+  var guards = DB.all('culture').filter(function (c) { return c.category === '盗版避雷'; });
+  $('#guardList').innerHTML = guards.length ? guards.map(function (c) {
+    return '<div class="card card-pad" style="margin-bottom:12px">' +
+      '<div class="card-meta"><span class="tag red">盗版避雷</span><span>出品方：' + esc(c.brand) + '</span></div>' +
+      '<div class="card-title" style="margin-top:8px">' + esc(c.title) + '</div>' +
+      '<div class="card-desc">' + esc(c.intro) + '</div></div>';
+  }).join('') : '<div class="empty"><div class="big">✅</div>暂无避雷资讯</div>';
+})();
+</script>
+</body>
+</html>

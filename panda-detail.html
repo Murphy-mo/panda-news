@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>熊猫档案 - 熊猫资讯</title>
+<meta name="description" content="单只熊猫完整档案：谱系号、父母、大事记、名场面与关联科普。">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐼</text></svg>">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header" id="site-header"></header>
+
+<main class="wrap" style="max-width:880px">
+  <div style="margin-top:24px"><a href="archive.html" style="font-size:13.5px">← 返回档案库</a></div>
+
+  <div class="detail-hero" id="head"></div>
+
+  <section class="section">
+    <div class="section-head"><span class="line"></span><h2>成长大事记</h2></div>
+    <div id="timeline" class="timeline"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><span class="line"></span><h2>名场面 · 趣闻</h2></div>
+    <div class="grid grid-2" id="stories"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><span class="line"></span><h2>精选图库</h2></div>
+    <div class="grid grid-4" id="gallery"></div>
+  </section>
+
+  <section class="section">
+    <div class="section-head"><span class="line"></span><h2>关联科普与场馆</h2></div>
+    <div id="related"></div>
+  </section>
+
+  <div style="margin-top:26px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+    <button class="btn btn-ghost" id="btnPrev">◀ 上一只</button>
+    <button class="btn btn-outline" id="btnRandom">🎲 随机一只</button>
+    <button class="btn btn-ghost" id="btnNext">下一只 ▶</button>
+  </div>
+</main>
+
+<footer class="site-footer" id="site-footer"></footer>
+<div id="toast"></div>
+
+<script src="js/seed-data.js"></script>
+<script src="js/store.js"></script>
+<script src="js/ui.js"></script>
+<script>
+(function () {
+  var DB = PandaDB, U = PandaUI, esc = U.esc, $ = U.$;
+  var id = new URLSearchParams(location.search).get('id');
+  var p = DB.find('pandas', id);
+
+  function render(panda) {
+    if (!panda) {
+      $('main').innerHTML = '<div class="empty" style="padding:80px 0"><div class="big">🐼</div>未找到该熊猫档案<br><a class="btn btn-primary btn-sm" style="margin-top:14px" href="archive.html">返回档案库</a></div>';
+      return;
+    }
+    p = panda;
+    var venue = DB.find('venues', p.venue);
+    $('#head').innerHTML =
+      '<div style="display:flex;gap:22px;flex-wrap:wrap;align-items:center">' +
+      '<div style="width:150px;flex-shrink:0">' + U.pandaSVG(p.name, p.id, { w: 300 }) + '</div>' +
+      '<div style="flex:1;min-width:250px">' +
+      '<h1>' + esc(p.name) + ' <span style="font-size:16px;color:var(--ink-3)">' + esc(p.nick || '') + '</span></h1>' +
+      '<div class="detail-meta">' +
+      '<span>性别：' + esc(p.gender) + '</span><span>出生：' + esc(p.birthday) + '</span><span>谱系号：' + esc(p.studbook) + '</span>' +
+      '</div>' +
+      '<p style="font-size:14px;color:var(--ink-2);margin-top:8px"><b>父母：</b>' + esc(p.parents) + '</p>' +
+      '<p style="font-size:14px;color:var(--ink-2)"><b>现居：</b>' + (venue ? '<a href="zoo-detail.html?id=' + venue.id + '">' + esc(venue.name) + '</a>' : '—') + '</p>' +
+      '<p style="font-size:14px;color:var(--ink-2)"><b>性格：</b>' + esc(p.personality) + '</p>' +
+      '<p style="font-size:14px;color:var(--ink-2)"><b>标志性特征：</b>' + esc(p.feature) + '</p>' +
+      '<p style="font-size:14px;color:var(--ink-2);margin-top:8px">' + esc(p.intro) + '</p>' +
+      '</div></div>';
+
+    $('#timeline').innerHTML = (p.timeline || []).slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; })
+      .map(function (t) {
+        return '<div class="tl-item"><div class="tl-date">' + t.date + '</div><div style="font-size:14px">' + esc(t.text) + '</div></div>';
+      }).join('') || '<div class="empty" style="padding:16px"><div class="big">🌱</div>档案建设中</div>';
+
+    $('#stories').innerHTML = (p.stories || []).map(function (s) {
+      return '<div class="card card-pad"><div class="card-title">✨ ' + esc(s.title) + '</div><div class="card-desc">' + esc(s.text) + '</div></div>';
+    }).join('') || '<div class="empty" style="grid-column:1/-1"><div class="big">🍃</div>趣闻整理中</div>';
+
+    $('#gallery').innerHTML = ['a', 'b', 'c', 'd'].map(function (k) {
+      return '<div class="panda-avatar">' + U.pandaSVG(p.name, p.id + k, { w: 480, name: false, bg: ['#e8f5e9', '#f1f8e9', '#e0f2f1', '#f9fbe7'][k.charCodeAt(0) % 4] }) + '</div>';
+    }).join('');
+
+    var related = [];
+    DB.all('articles').forEach(function (a) {
+      if (a.relatedPanda === p.id || (venue && a.relatedVenue === venue.id)) related.push(a);
+    });
+    $('#related').innerHTML = related.length ? related.map(function (a) {
+      return '<a class="card card-pad" href="article.html?id=' + a.id + '" style="color:inherit">' +
+        '<div class="card-meta"><span class="tag green">' + esc(a.category) + '</span><span class="tag blue">' + esc(a.difficulty) + '</span></div>' +
+        '<div class="card-title" style="margin-top:8px">' + esc(a.title) + '</div></a>';
+    }).join('') : '<div class="empty"><div class="big">📚</div>暂无关联内容</div>';
+
+    document.title = p.name + ' 档案 - 熊猫资讯';
+  }
+
+  function siblings() {
+    var list = DB.all('pandas');
+    var i = list.findIndex(function (x) { return x.id === p.id; });
+    return { list: list, i: i };
+  }
+
+  $('#btnPrev').addEventListener('click', function () {
+    var s = siblings();
+    var prev = s.list[(s.i - 1 + s.list.length) % s.list.length];
+    location.href = 'panda-detail.html?id=' + prev.id;
+  });
+  $('#btnNext').addEventListener('click', function () {
+    var s = siblings();
+    var next = s.list[(s.i + 1) % s.list.length];
+    location.href = 'panda-detail.html?id=' + next.id;
+  });
+  $('#btnRandom').addEventListener('click', function () {
+    var list = DB.all('pandas');
+    if (!list.length) return U.toast('档案库为空');
+    var r = list[Math.floor(Math.random() * list.length)];
+    location.href = 'panda-detail.html?id=' + r.id;
+  });
+
+  render(p);
+})();
+</script>
+</body>
+</html>
